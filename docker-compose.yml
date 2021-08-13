@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:10.1-alpine
+    volumes:
+      - pg_data:/var/lib/pg/data/
+    environment:
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+  django:
+    container_name: articles_and_comments
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: bash -c "python /usr/src/articles_and_comments/manage.py migrate --noinput &&
+              python /usr/src/articles_and_comments/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/usr/src/articles_and_comments
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+
+volumes:
+  pg_data:
