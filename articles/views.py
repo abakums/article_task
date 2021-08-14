@@ -20,7 +20,7 @@ class APIArticleComments(generics.ListCreateAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             try:
-                comment = serializer.save(path=[-1], article=Article.objects.get(pk=kwargs['pk']))
+                comment = serializer.save(path=[-1], article_id=kwargs['pk'])
                 comment.path = [comment.id]
                 comment.save()
             except:
@@ -31,7 +31,7 @@ class APIArticleComments(generics.ListCreateAPIView):
 
     def get_queryset(self):
         """Получение комментариев к статье до 3 уровня включительно"""
-        return Comment.objects.filter(article=self.kwargs['pk'], path__len__lte=3)
+        return Comment.objects.filter(article_id=self.kwargs['pk'], path__len__lte=3)
 
 
 class APINestedComments(generics.ListCreateAPIView):
@@ -47,7 +47,7 @@ class APINestedComments(generics.ListCreateAPIView):
         if serializer.is_valid():
             try:
                 parent_comment = Comment.objects.get(id=kwargs['pk'])
-                comment = serializer.save(path=parent_comment.path, article=parent_comment.article)
+                comment = serializer.save(path=parent_comment.path, article_id=parent_comment.article_id)
                 comment.path.append(comment.id)
                 comment.save()
             except:
